@@ -9,6 +9,16 @@ const usuarioSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+    },
+
+    senha: {
+        type: String,
+        required: true,
+    },
+
+    imagem: {
+        type: String,
+        required: true,
     }
 })
 
