@@ -17,20 +17,28 @@ export async function listarUsuariosService() {
     return await Usuario.find()
 }
 
-export async function listarUsuariosPorNome(data) {
+export async function encontrarUsuarioPorIdService(id) {
+    return await Usuario.findById(id)
+}
+
+export async function listarUsuariosPorNomeService(data) {
 
     const nomeUsuario = data.nome
 
     return await Usuario.find({
-    nome: { $regex: nomeUsuario, $options: "i" }
-  });
+        nome: { $regex: nomeUsuario, $options: "i" }
+    });
 }
 
-export async function encontrarUsuarioLogin(data) {
+export async function encontrarUsuarioPorEmailService(email) {
+    return await Usuario.find({ email: email })
+}
+
+export async function encontrarUsuarioLoginService(data) {
 
     const { email, senha } = data
 
-    const usuario = await Usuario.find({email: email})
+    const usuario = await Usuario.find({ email: email })
 
     console.log(usuario)
 
@@ -47,4 +55,24 @@ export async function encontrarUsuarioLogin(data) {
     }
 
     return usuario
+}
+
+export async function alterarUsuarioService(id, newUserData) {
+
+    const payload = { ...newUserData }
+
+    if (payload.senha) {
+        payload.senha = await bcrypt.hash(payload.senha, 10)
+    }
+
+    const usuarioAtualizado = Usuario.findByIdAndUpdate(id, payload, {
+        new: true,
+        runValidators: true,
+    }).lean();
+
+    return usuarioAtualizado
+}
+
+export async function deletarProfessorService(id) {
+    return await Usuario.findByIdAndDelete(id)
 }
