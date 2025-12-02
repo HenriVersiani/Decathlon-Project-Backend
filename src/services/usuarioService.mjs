@@ -73,6 +73,54 @@ export async function alterarUsuarioService(id, newUserData) {
     return usuarioAtualizado
 }
 
+export async function alterarNomeUsuarioService(id, newName) {
+
+    console.log(newName)
+
+    const usuarioAtualizado = Usuario.findByIdAndUpdate(id, { nome: newName.nome }, { // fazendo assim para garantir que vai ser alterado o campo "nome"
+        new: true,
+        runValidators: true,
+    }).lean();
+
+    return usuarioAtualizado
+}
+
+export async function alterarEmailUsuarioService(id, newEmail) {
+
+    const usuarioAtualizado = Usuario.findByIdAndUpdate(id, { email: newEmail.email }, {
+        new: true,
+        runValidators: true
+    }).lean()
+
+    return usuarioAtualizado
+}
+
+export async function alterarSenhaUsuarioService(id, data) {
+
+    let { senhaNova, senhaAntiga } = data
+
+    const usuario = await Usuario.findById(id)
+
+    console.log(senhaAntiga, senhaNova)
+
+    const senhaVerify = await bcrypt.compare(senhaAntiga, usuario.senha)
+
+    if (!senhaVerify) {
+         return "Senha informada Incorreta"
+    }
+
+    if (senhaNova) {
+        senhaNova = await bcrypt.hash(senhaNova, 10)
+    }
+
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { senha: senhaNova }, {
+        new: true,
+        runValidators: true
+    }).lean()
+
+    return usuarioAtualizado
+}
+
 export async function deletarProfessorService(id) {
     return await Usuario.findByIdAndDelete(id)
 }

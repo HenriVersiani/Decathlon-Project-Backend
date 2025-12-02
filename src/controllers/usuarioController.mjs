@@ -1,4 +1,4 @@
-import { alterarUsuarioService, criarUsuarioService,  deletarProfessorService,  encontrarUsuarioLoginService, encontrarUsuarioPorEmailService, encontrarUsuarioPorIdService, listarUsuariosPorNomeService, listarUsuariosService } from "../services/usuarioService.mjs"
+import { alterarEmailUsuarioService, alterarNomeUsuarioService, alterarSenhaUsuarioService, alterarUsuarioService, criarUsuarioService,  deletarProfessorService,  encontrarUsuarioLoginService, encontrarUsuarioPorEmailService, encontrarUsuarioPorIdService, listarUsuariosPorNomeService, listarUsuariosService } from "../services/usuarioService.mjs"
 
 export async function criarUsuarioController(req, res) {
     const data = req.body
@@ -48,6 +48,30 @@ export async function atualizarUsuarioController(req, res) {
     return res.json(response)
 }
 
+
+export async function atualizarNomeUsuarioController(req, res) {
+    const data = req.body
+    const { id } = req.params
+
+    const response = await alterarNomeUsuarioService(id, data)
+    return res.json(response)
+}
+
+export async function atualizarEmailUsuarioController(req, res) {
+    const data = req.body
+    const { id } = req.params
+
+    const response = await alterarEmailUsuarioService(id, data)
+    return res.json(response)
+}
+
+export async function atualizarSenhaUsuarioController(req, res) {
+    const data = req.body
+    const { id } = req.params
+
+    const response = await alterarSenhaUsuarioService(id, data)
+    return res.json(response)
+}
 // outros controllers de atualizar por campo especifico
 
 export async function deletarProfessorController(req, res){
