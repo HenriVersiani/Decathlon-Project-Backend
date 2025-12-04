@@ -4,7 +4,6 @@ export const userRouter = express.Router();
 
 userRouter.get("/", listarUsuariosController)
 userRouter.get("/nome", listarUsuarioPorNomeController)
-userRouter.get("/login", LoginUsuarioController);
 userRouter.get("/id/:id", encontrarUsuarioPorIdController)
 userRouter.get("/email", encontrarUsuarioPorEmailController)
 
@@ -14,6 +13,7 @@ userRouter.put("/email/:id", atualizarEmailUsuarioController)
 userRouter.put("/senha/:id", atualizarSenhaUsuarioController)
 // rotas com diferentes campos de alteraçao.
 
+userRouter.post("/login", LoginUsuarioController);
 userRouter.post("/", criarUsuarioController);
 
 userRouter.delete("/:id", deletarProfessorController)

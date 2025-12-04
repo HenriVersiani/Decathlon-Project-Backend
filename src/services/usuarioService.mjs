@@ -1,5 +1,48 @@
 import { Usuario } from "../models/usuarioModel.mjs";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv"
+import jwt from "jsonwebtoken";
+
+dotenv.config()
+
+const getJwtConfig = () => {
+    const secret = process.env.JWT_SECRET
+    const expiresIn = process.env.JWT_EXPIRES_IN
+
+    if (!secret) {
+        throw new Error("JWT_SECRET não configurado.");
+    }
+
+    return { secret, expiresIn}
+}
+
+const gerarToken = (usuario) =>{
+    const {secret, expiresIn } = getJwtConfig()
+    return jwt.sign({ sub: usuario._id, email: usuario.email }, secret, {expiresIn})
+}
+
+
+
+export async function encontrarUsuarioLoginService(data) {
+
+    const { email, senha } = data
+
+    const usuario = await Usuario.find({ email: email })
+
+    console.log(usuario)
+
+    if (usuario.length === 0) {
+        return { error: "Usuario não encontrado" }
+    }
+
+    const senhaVerify = await bcrypt.compare(senha, usuario[0].senha)
+
+    if (!senhaVerify) {
+        return { error: "Senha Incorreta" }
+    }
+
+    return usuario
+}
 
 export async function criarUsuarioService(data) {
 
@@ -9,8 +52,10 @@ export async function criarUsuarioService(data) {
         payload.senha = await bcrypt.hash(payload.senha, 10)
     }
 
-    const novoUsuario = new Usuario(payload)
-    return await novoUsuario.save()
+    const usuarioCriado = new Usuario(payload).save()
+    const token = gerarToken(usuarioCriado)
+
+    return {token, usuario: usuarioCriado} // desestruturar para ficar as chaves do objeto usuario ao lado de token.
 }
 
 export async function listarUsuariosService() {
@@ -34,28 +79,6 @@ export async function encontrarUsuarioPorEmailService(email) {
     return await Usuario.find({ email: email })
 }
 
-export async function encontrarUsuarioLoginService(data) {
-
-    const { email, senha } = data
-
-    const usuario = await Usuario.find({ email: email })
-
-    console.log(usuario)
-
-    if (usuario.length === 0) {
-        return "Usuário não encontrado!"
-    }
-
-    const senhaVerify = await bcrypt.compare(senha, usuario[0].senha)
-
-    console.log(senhaVerify)
-
-    if (!senhaVerify) {
-        return "Senha Incorreta"
-    }
-
-    return usuario
-}
 
 export async function alterarUsuarioService(id, newUserData) {
 
@@ -106,7 +129,7 @@ export async function alterarSenhaUsuarioService(id, data) {
     const senhaVerify = await bcrypt.compare(senhaAntiga, usuario.senha)
 
     if (!senhaVerify) {
-         return "Senha informada Incorreta"
+        return { error: "Senha incorreta informada" }
     }
 
     if (senhaNova) {
