@@ -21,8 +21,6 @@ const gerarToken = (usuario) =>{
     return jwt.sign({ sub: usuario._id, email: usuario.email }, secret, {expiresIn})
 }
 
-
-
 export async function encontrarUsuarioLoginService(data) {
 
     const { email, senha } = data
@@ -38,7 +36,7 @@ export async function encontrarUsuarioLoginService(data) {
     const senhaVerify = await bcrypt.compare(senha, usuario[0].senha)
 
     if (!senhaVerify) {
-        return { error: "Senha Incorreta" }
+        return  { error: "Senha Incorreta" }
     }
 
     return usuario
@@ -52,10 +50,11 @@ export async function criarUsuarioService(data) {
         payload.senha = await bcrypt.hash(payload.senha, 10)
     }
 
-    const usuarioCriado = new Usuario(payload).save()
+    const usuarioCriado = await new Usuario(payload).save()
     const token = gerarToken(usuarioCriado)
+    const { _id, nome, email } = usuarioCriado
 
-    return {token, usuario: usuarioCriado} // desestruturar para ficar as chaves do objeto usuario ao lado de token.
+    return { token, _id, nome, email } // desestruturar para ficar as chaves do objeto usuario ao lado de token. para que o retorno seja 1 objeto com todas as chaves, e nao 2.
 }
 
 export async function listarUsuariosService() {
@@ -76,7 +75,8 @@ export async function listarUsuariosPorNomeService(data) {
 }
 
 export async function encontrarUsuarioPorEmailService(email) {
-    return await Usuario.find({ email: email })
+    const usuario = await Usuario.find({ email: email })
+    return usuario[0]
 }
 
 
@@ -145,5 +145,7 @@ export async function alterarSenhaUsuarioService(id, data) {
 }
 
 export async function deletarProfessorService(id) {
-    return await Usuario.findByIdAndDelete(id)
+    const usuario = await Usuario.findByIdAndDelete(id)
+    const { nome } = usuario
+    return {message: `Usuario ${nome} deletado com sucesso!`}
 }

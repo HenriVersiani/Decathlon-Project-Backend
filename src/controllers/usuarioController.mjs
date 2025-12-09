@@ -8,7 +8,7 @@ export async function criarUsuarioController(req, res) {
 }
 
 export async function listarUsuarioPorNomeController(req, res) {
-    const data = req.body
+    const data = req.params
 
     const response = await listarUsuariosPorNomeService(data)
     return res.json(response)
@@ -22,7 +22,7 @@ export async function encontrarUsuarioPorIdController(req, res){
 }
 
 export async function encontrarUsuarioPorEmailController(req, res){
-    const { email } = req.body
+    const { email } = req.params
 
     const response = await encontrarUsuarioPorEmailService(email)
     return res.json(response)
