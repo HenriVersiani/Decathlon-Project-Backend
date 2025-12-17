@@ -144,7 +144,7 @@ export async function alterarSenhaUsuarioService(id, data) {
     return usuarioAtualizado
 }
 
-export async function deletarProfessorService(id) {
+export async function deletarUsuarioService(id) {
     const usuario = await Usuario.findByIdAndDelete(id)
     const { nome } = usuario
     return {message: `Usuario ${nome} deletado com sucesso!`}
