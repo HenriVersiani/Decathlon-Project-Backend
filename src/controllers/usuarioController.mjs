@@ -1,7 +1,16 @@
-import { alterarEmailUsuarioService, alterarNomeUsuarioService, alterarSenhaUsuarioService, alterarUsuarioService, criarUsuarioService,  deletarProfessorService,  encontrarUsuarioLoginService, encontrarUsuarioPorEmailService, encontrarUsuarioPorIdService, listarUsuariosPorNomeService, listarUsuariosService } from "../services/usuarioService.mjs"
+import { alterarEmailUsuarioService, alterarImagemUsuarioService, alterarNomeUsuarioService, alterarSenhaUsuarioService, alterarUsuarioService, criarUsuarioService, deletarUsuarioService, encontrarUsuarioLoginService, encontrarUsuarioPorEmailService, encontrarUsuarioPorIdService, listarUsuariosPorNomeService, listarUsuariosService } from "../services/usuarioService.mjs"
 
 export async function criarUsuarioController(req, res) {
     const data = req.body
+    const { email } = data
+
+    const usuarioExistente = await encontrarUsuarioPorEmailService(email)
+
+    console.log(usuarioExistente)
+
+    if (usuarioExistente) {
+        return res.json({ error: "Email já existente!" })
+    }
 
     const response = await criarUsuarioService(data)
     return res.json(response)
@@ -14,14 +23,14 @@ export async function listarUsuarioPorNomeController(req, res) {
     return res.json(response)
 }
 
-export async function encontrarUsuarioPorIdController(req, res){
+export async function encontrarUsuarioPorIdController(req, res) {
     const { id } = req.params
     const response = await encontrarUsuarioPorIdService(id)
 
     return res.json(response)
 }
 
-export async function encontrarUsuarioPorEmailController(req, res){
+export async function encontrarUsuarioPorEmailController(req, res) {
     const { email } = req.params
 
     const response = await encontrarUsuarioPorEmailService(email)
@@ -31,7 +40,7 @@ export async function encontrarUsuarioPorEmailController(req, res){
 export async function listarUsuariosController(req, res) {
     const response = await listarUsuariosService()
     return res.json(response)
-} 
+}
 
 export async function LoginUsuarioController(req, res) {
     const data = req.body
@@ -72,11 +81,33 @@ export async function atualizarSenhaUsuarioController(req, res) {
     const response = await alterarSenhaUsuarioService(id, data)
     return res.json(response)
 }
+
+export async function atualizarImagemUsuarioController(req, res) {
+    const { id } = req.params
+    const data = req.body
+
+    const response = await alterarImagemUsuarioService(id, data)
+    return res.json(response)
+}
+
 // outros controllers de atualizar por campo especifico
 
-export async function deletarProfessorController(req, res){
+export async function deletarUsuarioController(req, res) {
     const { id } = req.params
 
-    const response = await deletarProfessorService(id)
+    if(!id){
+        return res.json({error: "Usuário não encontrado!"})
+    }
+
+    const verifyUser = await encontrarUsuarioPorIdService(id)
+
+    console.log(verifyUser)
+
+    if (!verifyUser) {
+        return res.json({error: "Usuário não encontrado!"})
+    }
+
+    const response = await deletarUsuarioService(id)
+
     return res.json(response)
 }

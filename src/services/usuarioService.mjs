@@ -39,7 +39,10 @@ export async function encontrarUsuarioLoginService(data) {
         return  { error: "Senha Incorreta" }
     }
 
-    return usuario
+    const token = gerarToken(usuario)
+    const { _id, nome } = usuario[0]
+
+    return {_id, nome, email, token}
 }
 
 export async function criarUsuarioService(data) {
@@ -98,8 +101,6 @@ export async function alterarUsuarioService(id, newUserData) {
 
 export async function alterarNomeUsuarioService(id, newName) {
 
-    console.log(newName)
-
     const usuarioAtualizado = Usuario.findByIdAndUpdate(id, { nome: newName.nome }, { // fazendo assim para garantir que vai ser alterado o campo "nome"
         new: true,
         runValidators: true,
@@ -137,6 +138,17 @@ export async function alterarSenhaUsuarioService(id, data) {
     }
 
     const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { senha: senhaNova }, {
+        new: true,
+        runValidators: true
+    }).lean()
+
+    return usuarioAtualizado
+}
+
+export async function alterarImagemUsuarioService(id, newImagem) {
+
+
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { imagem: newImagem.imagem }, {
         new: true,
         runValidators: true
     }).lean()
