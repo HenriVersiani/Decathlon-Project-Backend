@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv"
 import cors from 'cors'
 import { userRouter } from "./src/routes/usuarioRoutes.mjs";
+import { productRouter } from "./src/routes/produtoRoutes.mjs";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(cors())
 
 app.use("/users", userRouter)
+app.use("/products", productRouter)
 
 const PORT = process.env.PORT || 3000;
 
