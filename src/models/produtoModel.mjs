@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+/*import mongoose from "mongoose";
 
 const produtoSchema = new mongoose.Schema({
     nome: {
@@ -23,4 +23,4 @@ const produtoSchema = new mongoose.Schema({
     }
 )
 
-export const Product = mongoose.model('Product', produtoSchema)
+export const Product = mongoose.model('Product', produtoSchema)*/

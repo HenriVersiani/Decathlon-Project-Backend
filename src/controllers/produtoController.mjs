@@ -1,4 +1,4 @@
-import { criarProdutoService, listarProdutosService } from "../services/produtoService.mjs"
+/*import { criarProdutoService, listarProdutosService } from "../services/produtoService.mjs"
 
 export async function listarProdutosController(req, res) {
     
@@ -11,4 +11,4 @@ export async function criarProdutoController(req, res) {
 
     const response = await criarProdutoService(data)
     return res.json(response)
-}
+}*/
