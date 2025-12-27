@@ -25,22 +25,20 @@ export async function encontrarUsuarioLoginService(data) {
 
     const { email, senha } = data
 
-    const usuario = await Usuario.find({ email: email })
+    const usuario = await Usuario.findOne({ email: email })
 
-    console.log(usuario)
-
-    if (usuario.length === 0) {
+    if (usuario === null || usuario.length === 0) {
         return { error: "Usuario não encontrado" }
     }
 
-    const senhaVerify = await bcrypt.compare(senha, usuario[0].senha)
+    const senhaVerify = await bcrypt.compare(senha, usuario.senha)
 
     if (!senhaVerify) {
         return  { error: "Senha Incorreta" }
     }
 
     const token = gerarToken(usuario)
-    const { _id, nome } = usuario[0]
+    const { _id, nome } = usuario
 
     return {_id, nome, email, token}
 }

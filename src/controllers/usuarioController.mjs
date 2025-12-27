@@ -101,8 +101,6 @@ export async function deletarUsuarioController(req, res) {
 
     const verifyUser = await encontrarUsuarioPorIdService(id)
 
-    console.log(verifyUser)
-
     if (!verifyUser) {
         return res.json({error: "Usuário não encontrado!"})
     }
