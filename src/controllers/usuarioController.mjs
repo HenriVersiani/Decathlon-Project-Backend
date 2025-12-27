@@ -6,8 +6,6 @@ export async function criarUsuarioController(req, res) {
 
     const usuarioExistente = await encontrarUsuarioPorEmailService(email)
 
-    console.log(usuarioExistente)
-
     if (usuarioExistente) {
         return res.json({ error: "Email já existente!" })
     }
@@ -20,12 +18,26 @@ export async function listarUsuarioPorNomeController(req, res) {
     const data = req.params
 
     const response = await listarUsuariosPorNomeService(data)
+
+    if(!response || response.length == 0){
+        return res.json({error: "Usuario não encontrado!"})
+    }
+    
     return res.json(response)
 }
 
 export async function encontrarUsuarioPorIdController(req, res) {
     const { id } = req.params
+    
+    if(!id){
+        return res.json({error: "Id não informado"})
+    }
+
     const response = await encontrarUsuarioPorIdService(id)
+
+    if(!response || response == null){
+        return res.json({error: "Usuario não encontrado!"})
+    }
 
     return res.json(response)
 }
@@ -34,6 +46,11 @@ export async function encontrarUsuarioPorEmailController(req, res) {
     const { email } = req.params
 
     const response = await encontrarUsuarioPorEmailService(email)
+
+    if(!response || response.length == 0){
+         return res.json({error: "Usuario não encontrado!"})
+    }
+    
     return res.json(response)
 }
 
