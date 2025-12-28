@@ -28,10 +28,6 @@ export async function listarUsuarioPorNomeController(req, res) {
 
 export async function encontrarUsuarioPorIdController(req, res) {
     const { id } = req.params
-    
-    if(!id){
-        return res.json({error: "Id não informado"})
-    }
 
     const response = await encontrarUsuarioPorIdService(id)
 
@@ -111,11 +107,7 @@ export async function atualizarImagemUsuarioController(req, res) {
 
 export async function deletarUsuarioController(req, res) {
     const { id } = req.params
-
-    if(!id){
-        return res.json({error: "Usuário não encontrado!"})
-    }
-
+    
     const verifyUser = await encontrarUsuarioPorIdService(id)
 
     if (!verifyUser) {
