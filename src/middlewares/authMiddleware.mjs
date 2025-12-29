@@ -13,6 +13,7 @@ export function authMiddleware(req, res, next) {
     req.user = { // cria um objeto que vai possuir as chaves id e chave email reais do usuario que esta acessando, para que eu possa ultilizar essas informaçoes depois.
       id: decoded.sub,
       email: decoded.email,
+      role: decoded.role
     };
 
     next();

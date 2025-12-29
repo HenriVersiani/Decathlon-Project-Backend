@@ -5,9 +5,9 @@ import rateLimit from "express-rate-limit";
 
 export const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: 40,
     message: {
-        error: "Muitas tentativas de login! Tente mais Tarde."
+        error: "Muitas requisições de login! Tente mais Tarde."
     }
 })
 

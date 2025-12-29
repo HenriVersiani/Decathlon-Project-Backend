@@ -1,9 +1,10 @@
 import express from "express"
-import { atualizarEmailUsuarioController, atualizarImagemUsuarioController, atualizarNomeUsuarioController, atualizarSenhaUsuarioController, atualizarUsuarioController, criarUsuarioController ,  deletarUsuarioController, encontrarUsuarioPorEmailController, encontrarUsuarioPorIdController, listarUsuarioPorNomeController, listarUsuariosController, LoginUsuarioController } from "../controllers/usuarioController.mjs";
+import { atualizarEmailUsuarioController, atualizarImagemUsuarioController, atualizarNomeUsuarioController, atualizarSenhaUsuarioController, atualizarUsuarioController, criarAdminController, criarUsuarioController ,  deletarUsuarioController, encontrarUsuarioPorEmailController, encontrarUsuarioPorIdController, listarUsuarioPorNomeController, listarUsuariosController, LoginUsuarioController } from "../controllers/usuarioController.mjs";
 import { authMiddleware } from "../middlewares/authMiddleware.mjs";
 import { checkUserOwnership } from "../middlewares/ownershipMiddleware.mjs";
 import { loginLimiter } from "../middlewares/rateLimit.mjs";
 import { validateObjectId } from "../middlewares/validadeIdMiddleware.mjs";
+import { isAdmin } from "../middlewares/isAdmin.mjs";
 
 export const userRouter = express.Router();
 
@@ -20,6 +21,7 @@ userRouter.put("/imagem/:id",authMiddleware, checkUserOwnership, atualizarImagem
 
 userRouter.post("/login", loginLimiter, LoginUsuarioController);
 userRouter.post("/", criarUsuarioController);
+userRouter.post("/admin",authMiddleware, isAdmin ,criarAdminController)
 
 userRouter.delete("/:id",authMiddleware,validateObjectId, checkUserOwnership,  deletarUsuarioController)
 

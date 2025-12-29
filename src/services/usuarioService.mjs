@@ -13,12 +13,12 @@ const getJwtConfig = () => {
         throw new Error("JWT_SECRET não configurado.");
     }
 
-    return { secret, expiresIn}
+    return { secret, expiresIn }
 }
 
-const gerarToken = (usuario) =>{
-    const {secret, expiresIn } = getJwtConfig()
-    return jwt.sign({ sub: usuario._id, email: usuario.email }, secret, {expiresIn})
+const gerarToken = (usuario) => {
+    const { secret, expiresIn } = getJwtConfig()
+    return jwt.sign({ sub: usuario._id, email: usuario.email, role: usuario.role }, secret, { expiresIn })
 }
 
 export async function encontrarUsuarioLoginService(data) {
@@ -27,20 +27,55 @@ export async function encontrarUsuarioLoginService(data) {
 
     const usuario = await Usuario.findOne({ email: email })
 
-    if (usuario === null || usuario.length === 0) {
+    if (usuario === null || !usuario) {
         return { error: "Usuario não encontrado" }
+    }
+
+    if (usuario.lockUntil && usuario.lockUntil <= Date.now()) {
+        usuario.lockUntil = null;
+        usuario.loginAttempts = 0;
+        await usuario.save();
     }
 
     const senhaVerify = await bcrypt.compare(senha, usuario.senha)
 
     if (!senhaVerify) {
-        return  { error: "Senha Incorreta" }
+        usuario.loginAttempts += 1
+        await usuario.save();
+
+        if (usuario.loginAttempts >= 5) {
+            usuario.lockUntil = new Date(Date.now() + 15 * 60 * 1000) // aqui eu vejo se ele tentou fazer login 5 vezes, se tentou, e nao conseguiu, entao eu defino o campo de lock para a data atual adicionando 15 minutos. (tempo que ele ficara sem poder logar.)
+            await usuario.save()
+            return { error: "Muitas tentativas de login, tente mais tarde!" }
+        }
+        return { error: "Senha Incorreta" }
     }
+
+    usuario.loginAttempts = 0
+    usuario.lockUntil = null;
+    await usuario.save()
 
     const token = gerarToken(usuario)
     const { _id, nome } = usuario
 
-    return {_id, nome, email, token}
+    return { _id, nome, email, token }
+}
+
+export async function criarAdminService(data) {
+
+    const payload = { ...data }
+
+    if (payload.senha) {
+        payload.senha = await bcrypt.hash(payload.senha, 10)
+    }
+
+    payload.role = "admin"
+
+    const usuarioCriado = await new Usuario(payload).save()
+    const token = gerarToken(usuarioCriado)
+    const { _id, nome, email } = usuarioCriado
+
+    return { token, _id, nome, email }
 }
 
 export async function criarUsuarioService(data) {
@@ -157,5 +192,5 @@ export async function alterarImagemUsuarioService(id, newImagem) {
 export async function deletarUsuarioService(id) {
     const usuario = await Usuario.findByIdAndDelete(id)
     const { nome } = usuario
-    return {message: `Usuario ${nome} deletado com sucesso!`}
+    return { message: `Usuario ${nome} deletado com sucesso!` }
 }

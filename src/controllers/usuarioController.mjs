@@ -1,4 +1,20 @@
-import { alterarEmailUsuarioService, alterarImagemUsuarioService, alterarNomeUsuarioService, alterarSenhaUsuarioService, alterarUsuarioService, criarUsuarioService, deletarUsuarioService, encontrarUsuarioLoginService, encontrarUsuarioPorEmailService, encontrarUsuarioPorIdService, listarUsuariosPorNomeService, listarUsuariosService } from "../services/usuarioService.mjs"
+import { alterarEmailUsuarioService, alterarImagemUsuarioService, alterarNomeUsuarioService, alterarSenhaUsuarioService, alterarUsuarioService, criarAdminService, criarUsuarioService, deletarUsuarioService, encontrarUsuarioLoginService, encontrarUsuarioPorEmailService, encontrarUsuarioPorIdService, listarUsuariosPorNomeService, listarUsuariosService } from "../services/usuarioService.mjs"
+
+export async function criarAdminController(req, res) {
+    const data = req.body
+    const { email } = data
+
+    const usuarioExistente = await encontrarUsuarioPorEmailService(email)
+
+    console.log(usuarioExistente)
+
+    if (usuarioExistente) {
+        return res.json({ error: "Email já existente!" })
+    }
+
+    const response = await criarAdminService(data)
+    return res.json(response)
+}
 
 export async function criarUsuarioController(req, res) {
     const data = req.body
@@ -19,10 +35,10 @@ export async function listarUsuarioPorNomeController(req, res) {
 
     const response = await listarUsuariosPorNomeService(data)
 
-    if(!response || response.length == 0){
-        return res.json({error: "Usuario não encontrado!"})
+    if (!response || response.length == 0) {
+        return res.json({ error: "Usuario não encontrado!" })
     }
-    
+
     return res.json(response)
 }
 
@@ -31,8 +47,8 @@ export async function encontrarUsuarioPorIdController(req, res) {
 
     const response = await encontrarUsuarioPorIdService(id)
 
-    if(!response || response == null){
-        return res.json({error: "Usuario não encontrado!"})
+    if (!response || response == null) {
+        return res.json({ error: "Usuario não encontrado!" })
     }
 
     return res.json(response)
@@ -43,10 +59,10 @@ export async function encontrarUsuarioPorEmailController(req, res) {
 
     const response = await encontrarUsuarioPorEmailService(email)
 
-    if(!response || response.length == 0){
-         return res.json({error: "Usuario não encontrado!"})
+    if (!response || response.length == 0) {
+        return res.json({ error: "Usuario não encontrado!" })
     }
-    
+
     return res.json(response)
 }
 
@@ -107,11 +123,11 @@ export async function atualizarImagemUsuarioController(req, res) {
 
 export async function deletarUsuarioController(req, res) {
     const { id } = req.params
-    
+
     const verifyUser = await encontrarUsuarioPorIdService(id)
 
     if (!verifyUser) {
-        return res.json({error: "Usuário não encontrado!"})
+        return res.json({ error: "Usuário não encontrado!" })
     }
 
     const response = await deletarUsuarioService(id)

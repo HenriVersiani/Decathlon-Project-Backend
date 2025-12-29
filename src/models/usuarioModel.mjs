@@ -19,7 +19,24 @@ const usuarioSchema = new mongoose.Schema({
     imagem: {
         type: String,
         required: true,
-    }
+    },
+
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+        required: true,
+    },
+
+    loginAttempts: {
+        type: Number,
+        default: 0,
+    },
+
+    lockUntil: {
+        type: Date,
+        default: null,
+    },
 })
 
 export const Usuario = mongoose.model('Usuario', usuarioSchema)
