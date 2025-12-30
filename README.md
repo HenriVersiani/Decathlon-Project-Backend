@@ -22,11 +22,17 @@ Rate Limit
 
 🔐 Funcionalidades
 👤 Usuários
+
 Criar usuário
+
 Login usuário
+
 Listar usuários
+
 Buscar usuário por ID
+
 Atualizar usuário -- diversas formas
+
 Deletar usuário
 
 🛡️ Segurança
