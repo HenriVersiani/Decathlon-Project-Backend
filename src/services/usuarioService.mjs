@@ -25,35 +25,29 @@ export async function encontrarUsuarioLoginService(data) {
 
     const { email, senha } = data
 
-    const usuario = await Usuario.findOne({ email: email })
+    const usuario = await encontrarUsuarioPorEmailService(email) //unica
 
-    if (usuario === null || !usuario) {
+    if (!usuario) {
         return { error: "Usuario não encontrado" }
     }
 
     if (usuario.lockUntil && usuario.lockUntil <= Date.now()) {
-        usuario.lockUntil = null;
-        usuario.loginAttempts = 0;
-        await usuario.save();
+        await zerarUserTimeout(usuario)
     }
 
-    const senhaVerify = await bcrypt.compare(senha, usuario.senha)
+    const senhaVerify = await verifySenha(senha, usuario.senha)
 
-    if (!senhaVerify) {
+    if (senhaVerify == false) {
         usuario.loginAttempts += 1
         await usuario.save();
 
         if (usuario.loginAttempts >= 5) {
-            usuario.lockUntil = new Date(Date.now() + 15 * 60 * 1000) // aqui eu vejo se ele tentou fazer login 5 vezes, se tentou, e nao conseguiu, entao eu defino o campo de lock para a data atual adicionando 15 minutos. (tempo que ele ficara sem poder logar.)
-            await usuario.save()
-            return { error: "Muitas tentativas de login, tente mais tarde!" }
+            return await errorTentativas(usuario)
         }
         return { error: "Senha Incorreta" }
     }
 
-    usuario.loginAttempts = 0
-    usuario.lockUntil = null;
-    await usuario.save()
+    await zerarUserTimeout(usuario)
 
     const token = gerarToken(usuario)
     const { _id, nome } = usuario
@@ -65,13 +59,11 @@ export async function criarAdminService(data) {
 
     const payload = { ...data }
 
-    if (payload.senha) {
-        payload.senha = await bcrypt.hash(payload.senha, 10)
-    }
+    payload.senha = await criptografarSenha(payload.senha)
 
     payload.role = "admin"
 
-    const usuarioCriado = await new Usuario(payload).save()
+    const usuarioCriado = await salvarUsuarioBanco(payload)
     const token = gerarToken(usuarioCriado)
     const { _id, nome, email } = usuarioCriado
 
@@ -82,11 +74,9 @@ export async function criarUsuarioService(data) {
 
     const payload = { ...data }
 
-    if (payload.senha) {
-        payload.senha = await bcrypt.hash(payload.senha, 10)
-    }
+    payload.senha = criptografarSenha(payload.senha)
 
-    const usuarioCriado = await new Usuario(payload).save()
+    const usuarioCriado = await salvarUsuarioBanco(payload)
     const token = gerarToken(usuarioCriado)
     const { _id, nome, email } = usuarioCriado
 
@@ -111,8 +101,8 @@ export async function listarUsuariosPorNomeService(data) {
 }
 
 export async function encontrarUsuarioPorEmailService(email) {
-    const usuario = await Usuario.find({ email: email })
-    return usuario[0]
+    const usuario = await Usuario.findOne({ email: email })
+    return usuario
 }
 
 
@@ -120,9 +110,7 @@ export async function alterarUsuarioService(id, newUserData) {
 
     const payload = { ...newUserData }
 
-    if (payload.senha) {
-        payload.senha = await bcrypt.hash(payload.senha, 10)
-    }
+    payload.senha = criptografarSenha(payload.senha)
 
     const usuarioAtualizado = Usuario.findByIdAndUpdate(id, payload, {
         new: true,
@@ -156,19 +144,19 @@ export async function alterarSenhaUsuarioService(id, data) {
 
     let { senhaNova, senhaAntiga } = data
 
-    const usuario = await Usuario.findById(id)
+    const usuario = await encontrarUsuarioPorIdService(id)
 
-    console.log(senhaAntiga, senhaNova)
+    if(!usuario){
+        return {error: "Usuario não encontrado!"}
+    }
 
-    const senhaVerify = await bcrypt.compare(senhaAntiga, usuario.senha)
+    const senhaVerify = await verifySenha(senhaAntiga, usuario.senha)
 
-    if (!senhaVerify) {
+    if (senhaVerify == false) {
         return { error: "Senha incorreta informada" }
     }
 
-    if (senhaNova) {
-        senhaNova = await bcrypt.hash(senhaNova, 10)
-    }
+    senhaNova = await criptografarSenha(senhaNova)
 
     const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { senha: senhaNova }, {
         new: true,
@@ -179,8 +167,6 @@ export async function alterarSenhaUsuarioService(id, data) {
 }
 
 export async function alterarImagemUsuarioService(id, newImagem) {
-
-
     const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { imagem: newImagem.imagem }, {
         new: true,
         runValidators: true
@@ -193,4 +179,31 @@ export async function deletarUsuarioService(id) {
     const usuario = await Usuario.findByIdAndDelete(id)
     const { nome } = usuario
     return { message: `Usuario ${nome} deletado com sucesso!` }
+}
+
+export async function verifySenha(senhaNova, senhaAtual) {
+    const senhaVerify = await bcrypt.compare(senhaNova, senhaAtual) //unica
+    return senhaVerify
+}
+
+export async function errorTentativas(usuario) {
+    usuario.lockUntil = new Date(Date.now() + 15 * 60 * 1000) // aqui eu vejo se ele tentou fazer login 5 vezes, se tentou, e nao conseguiu, entao eu defino o campo de lock para a data atual adicionando 15 minutos. (tempo que ele ficara sem poder logar.)
+    await usuario.save()
+    return { error: "Muitas tentativas de login, tente mais tarde!" } //unica
+}
+
+export async function zerarUserTimeout(usuario) {
+    usuario.lockUntil = null; //unica
+    usuario.loginAttempts = 0;
+    await usuario.save();
+}
+
+export async function criptografarSenha(senha) {
+    if(senha){
+       return senha = await bcrypt.hash(senha, 10)
+    }
+}
+
+export async function salvarUsuarioBanco(data) {
+    return new Usuario(data).save()
 }
