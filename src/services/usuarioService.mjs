@@ -74,7 +74,7 @@ export async function criarUsuarioService(data) {
 
     const payload = { ...data }
 
-    payload.senha = criptografarSenha(payload.senha)
+    payload.senha = await criptografarSenha(payload.senha)
 
     const usuarioCriado = await salvarUsuarioBanco(payload)
     const token = gerarToken(usuarioCriado)
@@ -110,9 +110,9 @@ export async function alterarUsuarioService(id, newUserData) {
 
     const payload = { ...newUserData }
 
-    payload.senha = criptografarSenha(payload.senha)
+    payload.senha = await criptografarSenha(payload.senha)
 
-    const usuarioAtualizado = Usuario.findByIdAndUpdate(id, payload, {
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, payload, {
         new: true,
         runValidators: true,
     }).lean();
@@ -122,7 +122,7 @@ export async function alterarUsuarioService(id, newUserData) {
 
 export async function alterarNomeUsuarioService(id, newName) {
 
-    const usuarioAtualizado = Usuario.findByIdAndUpdate(id, { nome: newName.nome }, { // fazendo assim para garantir que vai ser alterado o campo "nome"
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { nome: newName.nome }, { // fazendo assim para garantir que vai ser alterado o campo "nome"
         new: true,
         runValidators: true,
     }).lean();
@@ -132,7 +132,7 @@ export async function alterarNomeUsuarioService(id, newName) {
 
 export async function alterarEmailUsuarioService(id, newEmail) {
 
-    const usuarioAtualizado = Usuario.findByIdAndUpdate(id, { email: newEmail.email }, {
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, { email: newEmail.email }, {
         new: true,
         runValidators: true
     }).lean()

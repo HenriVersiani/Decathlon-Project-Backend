@@ -5,6 +5,7 @@ import { checkUserOwnership } from "../middlewares/ownershipMiddleware.mjs";
 import { loginLimiter } from "../middlewares/rateLimit.mjs";
 import { validateObjectId } from "../middlewares/validadeIdMiddleware.mjs";
 import { isAdmin } from "../middlewares/isAdmin.mjs";
+import dosUaProtection from "../middlewares/dosUaProtection.mjs";
 
 export const userRouter = express.Router();
 
@@ -19,8 +20,8 @@ userRouter.put("/email/:id",authMiddleware, checkUserOwnership, atualizarEmailUs
 userRouter.put("/senha/:id",authMiddleware,validateObjectId, checkUserOwnership, atualizarSenhaUsuarioController)
 userRouter.put("/imagem/:id",authMiddleware, checkUserOwnership, atualizarImagemUsuarioController)
 
-userRouter.post("/login", loginLimiter, LoginUsuarioController);
-userRouter.post("/", criarUsuarioController);
+userRouter.post("/login", loginLimiter,dosUaProtection, LoginUsuarioController);
+userRouter.post("/",dosUaProtection, criarUsuarioController);
 userRouter.post("/admin",authMiddleware, isAdmin ,criarAdminController)
 
 userRouter.delete("/:id",authMiddleware,validateObjectId, checkUserOwnership,  deletarUsuarioController)
