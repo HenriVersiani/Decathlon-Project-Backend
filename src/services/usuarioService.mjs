@@ -18,7 +18,7 @@ const getJwtConfig = () => {
 
 const gerarToken = (usuario) => {
     const { secret, expiresIn } = getJwtConfig()
-    return jwt.sign({ sub: usuario._id, email: usuario.email, role: usuario.role }, secret, { expiresIn })
+    return jwt.sign({ sub: usuario._id, email: usuario.email, role: usuario.role, avatar: usuario.imagem }, secret, { expiresIn })
 }
 
 export async function encontrarUsuarioLoginService(data) {
@@ -144,16 +144,30 @@ export async function alterarSenhaUsuarioService(id, data) {
 
     let { senhaNova, senhaAntiga } = data
 
-    const usuario = await encontrarUsuarioPorIdService(id)
-
-    if(!usuario){
-        return {error: "Usuario não encontrado!"}
+    console.log(senhaAntiga, senhaNova)
+    
+    if(senhaNova && !senhaAntiga){
+        return { error: "Digite sua senha atual!" }
     }
 
-    const senhaVerify = await verifySenha(senhaAntiga, usuario.senha)
+    if (senhaAntiga) {
+        if (!senhaNova) {
+            return { error: "Digite sua nova senha!" }
+        }
+    }
 
-    if (senhaVerify == false) {
-        return { error: "Senha incorreta informada" }
+    const usuario = await encontrarUsuarioPorIdService(id)
+
+    if (!usuario) {
+        return { error: "Usuario não encontrado!" }
+    }
+
+    if (senhaAntiga) {
+        const senhaVerify = await verifySenha(senhaAntiga, usuario.senha)
+
+        if (senhaVerify == false) {
+            return { error: "Senha incorreta informada" }
+        }
     }
 
     senhaNova = await criptografarSenha(senhaNova)
@@ -199,8 +213,8 @@ export async function zerarUserTimeout(usuario) {
 }
 
 export async function criptografarSenha(senha) {
-    if(senha){
-       return senha = await bcrypt.hash(senha, 10)
+    if (senha) {
+        return senha = await bcrypt.hash(senha, 10)
     }
 }
 
