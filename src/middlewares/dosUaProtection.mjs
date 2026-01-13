@@ -8,7 +8,5 @@ export default function dosUaProtection(req, res, next){
     if(ua.length <= 10){
         return res.status(400).end() 
     }
-
-    console.log(ua)
     next()
 }

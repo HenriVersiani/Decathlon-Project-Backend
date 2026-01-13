@@ -26,4 +26,4 @@ userRouter.post("/admin",authMiddleware, isAdmin ,criarAdminController)
 
 userRouter.delete("/:id",authMiddleware,validateObjectId, checkUserOwnership,  deletarUsuarioController)
 
-//all routes defined on Flashpostt
+//rotas definidas no flashpost
