@@ -4,7 +4,7 @@ export function authMiddleware(req, res, next) {
   const token = req.headers.authorization;
 
   if (!token) {
-    return res.status(401).json({ error: "Token não informado" });
+    return res.status(401).json({ error: "Informed token" });
   }
 
   try {
@@ -18,7 +18,7 @@ export function authMiddleware(req, res, next) {
 
     next();
   } catch (err) {
-    return res.status(401).json({ error: "Token inválido ou expirado" });
+    return res.status(401).json({ error: "Token invalid or expired!" });
   }
 
 }

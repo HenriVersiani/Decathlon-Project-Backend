@@ -7,7 +7,7 @@ export const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 40,
     message: {
-        error: "Muitas requisições de login! Tente mais Tarde."
+        error: "Too many requests, please try later"
     }
 })
 

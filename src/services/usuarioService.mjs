@@ -28,7 +28,7 @@ export async function encontrarUsuarioLoginService(data) {
     const usuario = await encontrarUsuarioPorEmailService(email) //unica
 
     if (!usuario) {
-        return { error: "Usuario não encontrado" }
+        return { error: "User not found!" }
     }
 
     if (usuario.lockUntil && usuario.lockUntil <= Date.now()) {
@@ -44,7 +44,7 @@ export async function encontrarUsuarioLoginService(data) {
         if (usuario.loginAttempts >= 5) {
             return await errorTentativas(usuario)
         }
-        return { error: "Senha Incorreta" }
+        return { error: "Incorrect password!" }
     }
 
     await zerarUserTimeout(usuario)
@@ -147,26 +147,26 @@ export async function alterarSenhaUsuarioService(id, data) {
     console.log(senhaAntiga, senhaNova)
     
     if(senhaNova && !senhaAntiga){
-        return { error: "Digite sua senha atual!" }
+        return { error: "Type your current password!" }
     }
 
     if (senhaAntiga) {
         if (!senhaNova) {
-            return { error: "Digite sua nova senha!" }
+            return { error: "Type your new password!" }
         }
     }
 
     const usuario = await encontrarUsuarioPorIdService(id)
 
     if (!usuario) {
-        return { error: "Usuario não encontrado!" }
+        return { error: "User not Found!" }
     }
 
     if (senhaAntiga) {
         const senhaVerify = await verifySenha(senhaAntiga, usuario.senha)
 
         if (senhaVerify == false) {
-            return { error: "Senha incorreta informada" }
+            return { error: "Incorrect password!" }
         }
     }
 
@@ -192,7 +192,7 @@ export async function alterarImagemUsuarioService(id, newImagem) {
 export async function deletarUsuarioService(id) {
     const usuario = await Usuario.findByIdAndDelete(id)
     const { nome } = usuario
-    return { message: `Usuario ${nome} deletado com sucesso!` }
+    return { message: `User ${nome} deleted!` }
 }
 
 export async function verifySenha(senhaNova, senhaAtual) {
@@ -203,7 +203,7 @@ export async function verifySenha(senhaNova, senhaAtual) {
 export async function errorTentativas(usuario) {
     usuario.lockUntil = new Date(Date.now() + 15 * 60 * 1000) // aqui eu vejo se ele tentou fazer login 5 vezes, se tentou, e nao conseguiu, entao eu defino o campo de lock para a data atual adicionando 15 minutos. (tempo que ele ficara sem poder logar.)
     await usuario.save()
-    return { error: "Muitas tentativas de login, tente mais tarde!" } //unica
+    return { error: "Too many login attempts, please try later!" } //unica
 }
 
 export async function zerarUserTimeout(usuario) {

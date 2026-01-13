@@ -6,7 +6,7 @@ export function checkUserOwnership(req, res, next) {
     }
 
     if(req.user.id !== id){
-        return res.status(403).json({error: "Acesso Negado!"})
+        return res.status(403).json({error: "Access denied!"})
     }
 
     next()

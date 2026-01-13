@@ -9,7 +9,7 @@ export async function criarAdminController(req, res) {
     console.log(usuarioExistente)
 
     if (usuarioExistente) {
-        return res.json({ error: "Email já existente!" })
+        return res.json({ error: "Email already exists!" })
     }
 
     const response = await criarAdminService(data)
@@ -23,7 +23,7 @@ export async function criarUsuarioController(req, res) {
     const usuarioExistente = await encontrarUsuarioPorEmailService(email)
 
     if (usuarioExistente) {
-        return res.json({ error: "Email já existente!" })
+        return res.json({ error: "Email already exists!" })
     }
 
     const response = await criarUsuarioService(data)
@@ -36,7 +36,7 @@ export async function listarUsuarioPorNomeController(req, res) {
     const response = await listarUsuariosPorNomeService(data)
 
     if (!response || response.length == 0) {
-        return res.json({ error: "Usuario não encontrado!" })
+        return res.json({ error: "Users not found!" })
     }
 
     return res.json(response)
@@ -48,7 +48,7 @@ export async function encontrarUsuarioPorIdController(req, res) {
     const response = await encontrarUsuarioPorIdService(id)
 
     if (!response || response == null) {
-        return res.json({ error: "Usuario não encontrado!" })
+        return res.json({ error: "Users not found!" })
     }
 
     return res.json(response)
@@ -60,7 +60,7 @@ export async function encontrarUsuarioPorEmailController(req, res) {
     const response = await encontrarUsuarioPorEmailService(email)
 
     if (!response || response.length == 0) {
-        return res.json({ error: "Usuario não encontrado!" })
+        return res.json({ error: "Users not found!" })
     }
 
     return res.json(response)
@@ -127,7 +127,7 @@ export async function deletarUsuarioController(req, res) {
     const verifyUser = await encontrarUsuarioPorIdService(id)
 
     if (!verifyUser) {
-        return res.json({ error: "Usuário não encontrado!" })
+        return res.json({ error: "Users not found!" })
     }
 
     const response = await deletarUsuarioService(id)
